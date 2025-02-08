@@ -1,29 +1,30 @@
-import { useMemo } from 'react';
-import Modal from 'react-modal';
-import style from "./ImageModal.module.css";
+import { Image } from "../App/App.types";
+import Modal from "react-modal";
+import css from "./ImageModal.module.css";
 
-Modal.setAppElement('#root');
+interface ImageModalProps {
+  isOpen: boolean;
+  image: Image | null;
+  onCloseModal: () => void;
+}
 
-const ImageModal = ({ isOpen, closeModal, imageUrl, imageAlt }) => {
-  const modalContent = useMemo(() => {
-    return imageUrl ? (
-      <img className={style.image} src={imageUrl} alt={imageAlt} style={{ width: '100%', height: 'auto' }} />
-    ) : (
-      <p className={style.missing}>Зображення не доступне.</p>
-    );
-  }, [imageUrl, imageAlt]); 
+const ImageModal = ({ isOpen, image, onCloseModal }: ImageModalProps) => {
+  if (!image) {
+    return null; 
+  }
 
   return (
     <Modal
-      className={style.modal}
       isOpen={isOpen}
-      onRequestClose={closeModal}
-      ariaHideApp={false}
-      shouldCloseOnOverlayClick={true}
-      onKeyDown={(e) => e.key === 'Escape' && closeModal()}>
-      <div className={style.containerModal}>
-        {modalContent}
+      onRequestClose={onCloseModal}
+      className={css.modal}
+      overlayClassName={css.overlay}
+    >
+      <button className={css.closeButton} onClick={onCloseModal}>X</button>
+      <div className={css.imageWrapper}>
+        <img src={image.urls?.regular} alt={image.alt_description} className={css.image} />
       </div>
+      <p>{image.alt_description || "No description available"}</p>
     </Modal>
   );
 };

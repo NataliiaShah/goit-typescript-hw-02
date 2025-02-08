@@ -1,27 +1,36 @@
-import { useMemo } from 'react';
-import { nanoid } from 'nanoid';
+import { MouseEvent } from "react";
 import ImageCard from "../ImageCard/ImageCard";
-import style from "./ImageGallery.module.css";
+import css from "./ImageGallery.module.css";
+import { Image } from "../App/App.types";
 
-const ImageGallery = ({ images, openModal }) => {
-  
-  const imageItems = useMemo(() => {
-    return images.map((image) => (
-      <li className={style.galleryItem} key={nanoid()}>
-        <ImageCard
-          image={image}
-          onClick={() => openModal(image.urls.full, image.alt_description)}
-        />
-      </li>
-    ));
-  }, [images, openModal]); 
+type Props = {
+  imageList: Image[];
+  openModal: (image: Image) => void;
+}
 
+const ImageGallery = ({ imageList, openModal }: Props) => {
+  const imageClick = (event: MouseEvent<HTMLUListElement>): void => {
+    const imgItem = (event.target as Element).closest("li");
+    if (imgItem) {
+      const imgID = imgItem.dataset.id;
+      const clickedImageItem = imageList.find((image) => image.id === imgID);
+      if (clickedImageItem) {
+        openModal(clickedImageItem);
+      }
+    }
+  };
   return (
-    <div className={style.containerGallery}>
-      <ul className={style.gallery}>
-        {imageItems}
-      </ul>
-    </div>
+    <section className={css.containerGallery}>
+      {imageList.length > 0 && (
+        <ul className={css.gallery} onClick={imageClick}>
+          {imageList.map((img) => (
+            <li className={css.galleryItem} key={img.id} data-id={img.id}>
+              <ImageCard imageItem={img} />
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
   );
 };
 
